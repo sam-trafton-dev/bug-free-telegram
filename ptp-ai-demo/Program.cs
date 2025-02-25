@@ -31,7 +31,9 @@ var connection = string.Empty;
 var keyVaultUri = new Uri("https://kv-samatraf523931822466.vault.azure.net/");
 builder.Configuration.AddAzureKeyVault(keyVaultUri, new DefaultAzureCredential());
 
-connection = builder.Configuration.GetConnectionString("AZURE-SQL-CONNECTIONSTRING");
+connection = builder.Configuration["ConnectionString:AZURE-SQL-CONNECTIONSTRING"];
+Console.WriteLine("Connection value");
+Console.WriteLine(connection);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connection));
 
@@ -43,7 +45,6 @@ app.UseCors("AllowFlutterDev");
 
 app.UseSwagger();
 app.UseSwaggerUI();
-
 
 app.UseHttpsRedirection();
 
