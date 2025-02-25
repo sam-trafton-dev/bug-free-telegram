@@ -72,5 +72,6 @@ app.MapPost("/Application", (User user, ApplicationDbContext context) =>
     })
     .WithName("CreateUser")
     .WithOpenApi();
+Console.WriteLine("App starting...");
 app.Run();
 
