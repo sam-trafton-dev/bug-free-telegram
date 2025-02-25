@@ -1,0 +1,18 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ptp-ai-demo", "ptp-ai-demo\ptp-ai-demo.csproj", "{D265B874-26D3-44AF-8AAF-BD9B4FD87E13}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D265B874-26D3-44AF-8AAF-BD9B4FD87E13}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D265B874-26D3-44AF-8AAF-BD9B4FD87E13}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D265B874-26D3-44AF-8AAF-BD9B4FD87E13}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D265B874-26D3-44AF-8AAF-BD9B4FD87E13}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+	EndGlobalSection
+EndGlobal

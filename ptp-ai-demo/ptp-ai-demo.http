@@ -1,0 +1,6 @@
+@ptp_ai_demo_HostAddress = http://localhost:5191
+
+GET {{ptp_ai_demo_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
