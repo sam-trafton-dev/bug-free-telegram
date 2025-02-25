@@ -3,7 +3,7 @@ using ptp_ai_demo.Data;
 using ptp_ai_demo.Models;
 using Azure.Identity;
 using Azure.Extensions.AspNetCore.Configuration.Secrets;
-
+using Microsoft.CodeAnalysis.Options;
 
 
 var flutterDevPort = "http://localhost:60412";
@@ -31,18 +31,17 @@ builder.Services.AddControllers();
 var connection = string.Empty;
 if (builder.Environment.IsDevelopment())
 {
-    builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.Development.json");
-    connection = builder.Configuration.GetConnectionString("AZURE-SQL-CONECTIONSTRING");
+    builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.Development.json", optional: true);
 }
 else
 {
-    builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.json");
-    connection = builder.Configuration.GetConnectionString("AZURE-SQL-CONECTIONSTRING");
+    builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.json", optional: true);
 }
 
 var keyVaultUri = new Uri(builder.Configuration["KeyVault:VaultUri"]!);
 builder.Configuration.AddAzureKeyVault(keyVaultUri, new DefaultAzureCredential());
 
+connection = builder.Configuration.GetConnectionString("AZURE-SQL-CONECTIONSTRING");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connection));
 
