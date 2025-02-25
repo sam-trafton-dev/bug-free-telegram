@@ -31,7 +31,7 @@ var connection = string.Empty;
 var keyVaultUri = new Uri("https://kv-samatraf523931822466.vault.azure.net/");
 builder.Configuration.AddAzureKeyVault(keyVaultUri, new DefaultAzureCredential());
 
-connection = builder.Configuration.GetConnectionString("AZURE-SQL-CONECTIONSTRING");
+connection = builder.Configuration.GetConnectionString("AZURE-SQL-CONNECTIONSTRING");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connection));
 
