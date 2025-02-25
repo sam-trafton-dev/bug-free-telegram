@@ -27,16 +27,8 @@ builder.Services.AddCors(options =>
 builder.Services.AddControllers();
 
 var connection = string.Empty;
-if (builder.Environment.IsDevelopment())
-{
-    builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.Development.json", optional: true);
-}
-else
-{
-    builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.json", optional: true);
-}
 
-var keyVaultUri = new Uri(builder.Configuration["KeyVault:VaultUri"]!);
+var keyVaultUri = new Uri("https://kv-samatraf523931822466.vault.azure.net/");
 builder.Configuration.AddAzureKeyVault(keyVaultUri, new DefaultAzureCredential());
 
 connection = builder.Configuration.GetConnectionString("AZURE-SQL-CONECTIONSTRING");
