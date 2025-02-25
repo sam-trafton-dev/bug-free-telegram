@@ -3,6 +3,8 @@ using ptp_ai_demo.Data;
 using ptp_ai_demo.Models;
 using Newtonsoft.Json;
 using System.Text;
+using Microsoft.Identity.Client;
+using InvalidOperationException = System.InvalidOperationException;
 
 namespace ptp_ai_demo.Controllers;
 
@@ -108,10 +110,23 @@ public class PreTaskPlanController : ControllerBase
 
     private async Task<string> CallAzureOpenAiAsync(string prompt)
     {
-        string apiKey = _configuration["EHS-KEY1"] ?? throw new InvalidOperationException();
-        string endpoint = _configuration["AzureOpenAI:Endpoint"] ?? throw new InvalidOperationException();
-        string deploymentName = _configuration["AzureOpenAI:DeploymentName"] ?? throw new InvalidOperationException();
-        string apiVersion = _configuration["AzureOpenAI:ApiVersion"] ?? throw new InvalidOperationException();
+        string apiKey;
+        string endpoint;
+        string deploymentName;
+        string apiVersion;
+        try
+        {
+            apiKey = _configuration["EHS-KEY1"] ?? throw new InvalidOperationException();
+            endpoint = _configuration["AzureOpenAI:Endpoint"] ?? throw new InvalidOperationException();
+            deploymentName = _configuration["AzureOpenAI:DeploymentName"] ?? throw new InvalidOperationException();
+            apiVersion = _configuration["AzureOpenAI:ApiVersion"] ?? throw new InvalidOperationException();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Missing ${ex}, configuration value at startup");
+            throw;
+        }
+        
 
         var requestBody = new
         {

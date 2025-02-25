@@ -2,8 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using ptp_ai_demo.Data;
 using ptp_ai_demo.Models;
 using Azure.Identity;
-using Azure.Extensions.AspNetCore.Configuration.Secrets;
-using Microsoft.CodeAnalysis.Options;
 
 
 var flutterDevPort = "http://localhost:60412";
