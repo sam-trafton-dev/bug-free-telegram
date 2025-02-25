@@ -27,8 +27,6 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddControllers();
-var keyVaultUri = new Uri(builder.Configuration["KeyVault:VaultUri"]!);
-builder.Configuration.AddAzureKeyVault(keyVaultUri, new DefaultAzureCredential());
 
 var connection = string.Empty;
 if (builder.Environment.IsDevelopment())
@@ -41,6 +39,9 @@ else
     builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.json");
     connection = builder.Configuration.GetConnectionString("AZURE-SQL-CONECTIONSTRING");
 }
+
+var keyVaultUri = new Uri(builder.Configuration["KeyVault:VaultUri"]!);
+builder.Configuration.AddAzureKeyVault(keyVaultUri, new DefaultAzureCredential());
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connection));
