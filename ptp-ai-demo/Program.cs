@@ -35,7 +35,13 @@ connection = builder.Configuration["ConnectionString:AZURE-SQL-CONNECTIONSTRING"
 Console.WriteLine("Connection value");
 Console.WriteLine(connection);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connection));
+    options.UseSqlServer(connection, sqlOptions =>
+    {
+        sqlOptions.EnableRetryOnFailure(
+            maxRetryCount: 5,
+            maxRetryDelay: TimeSpan.FromSeconds(30),
+            errorNumbersToAdd: null);
+    }));
 
 var app = builder.Build();
 

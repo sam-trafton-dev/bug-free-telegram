@@ -22,6 +22,7 @@ class _PreTaskPlanReviewPageState extends State<PreTaskPlanReviewPage> {
   late TextEditingController summaryController;
   List<TextEditingController> sectionHeaderControllers = [];
   List<TextEditingController> sectionContentControllers = [];
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -78,6 +79,10 @@ class _PreTaskPlanReviewPageState extends State<PreTaskPlanReviewPage> {
   Future<void> _finalizeDocument() async {
     if (!_formKey.currentState!.validate()) return;
 
+    setState(() {
+      _isLoading = true;
+    });
+
     Map<String, dynamic> signSubmitData = {
       'signedBy': "USERIDOFCREATOR",
       'status': 'safetyReview',
@@ -94,23 +99,36 @@ class _PreTaskPlanReviewPageState extends State<PreTaskPlanReviewPage> {
     };
 
     var url = Uri.parse("${ApiConfig.signAndSubmitEndpoint}/${widget.inputId}");
-    final response = await http.post(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode(signSubmitData),
-    );
-    if (response.statusCode == 201 || response.statusCode == 200) {
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(signSubmitData),
+      );
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Form signed and submitted successfully!')),
+        );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => PreTaskPlanForm()),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(
+              'Failed to sign and submit: ${response.body} and ${response
+                  .statusCode}')),
+        );
+      }
+    } catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Form signed and submitted successfully!')),
+        SnackBar(content: Text('An error occurred: $error')),
       );
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => PreTaskPlanForm()),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to sign and submit: ${response.body} and ${response.statusCode}')),
-      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
   
@@ -164,7 +182,9 @@ class _PreTaskPlanReviewPageState extends State<PreTaskPlanReviewPage> {
             ),
             const SizedBox(height: 24),
             ElevatedButton(
-              onPressed: () {
+              onPressed: _isLoading
+                  ? null
+                  : () {
                 showDialog(
                   context: context,
                   builder: (BuildContext context) {
@@ -179,10 +199,31 @@ class _PreTaskPlanReviewPageState extends State<PreTaskPlanReviewPage> {
                           },
                         ),
                         ElevatedButton(
-                          child: const Text('Confirm'),
-                          onPressed: () {
+                          child: _isLoading
+                              ? SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                              strokeWidth: 2.0,
+                            ),
+                          )
+                              : const Text('Confirm'),
+                          onPressed: () async {
+                            // Close the dialog
                             Navigator.of(context).pop();
-                            _finalizeDocument();
+                            // Start loading state
+                            setState(() {
+                              _isLoading = true;
+                            });
+                            // Call your async function
+                            await _finalizeDocument();
+                            // When complete, reset loading state
+                            if (mounted) {
+                              setState(() {
+                                _isLoading = false;
+                              });
+                            }
                           },
                         ),
                       ],
@@ -190,7 +231,16 @@ class _PreTaskPlanReviewPageState extends State<PreTaskPlanReviewPage> {
                   },
                 );
               },
-              child: const Text('Sign & Submit Form'),
+              child: _isLoading
+                  ? SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  strokeWidth: 2.0,
+                ),
+              )
+                  : const Text('Sign & Submit Form'),
             ),
           ],
         ),

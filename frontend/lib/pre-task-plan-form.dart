@@ -13,18 +13,24 @@ class _PreTaskPlanFormState extends State<PreTaskPlanForm> {
   final _formKey = GlobalKey<FormState>();
   String? workArea;
   String? workActivity;
+  bool _isLoading = false;
 
   Future<void> _submitData() async {
-    if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
-      
-      Map<String, dynamic> data = {
-        'workArea': workArea,
-        'activityDescription': workActivity,
-      };
-      
-      var url = Uri.parse(ApiConfig.preTaskPlanEndpoint);
-      
+    if (!_formKey.currentState!.validate()) return;
+    _formKey.currentState!.save();
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    Map<String, dynamic> data = {
+      'workArea': workArea,
+      'activityDescription': workActivity,
+    };
+
+    var url = Uri.parse(ApiConfig.preTaskPlanEndpoint);
+
+    try {
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
@@ -32,11 +38,10 @@ class _PreTaskPlanFormState extends State<PreTaskPlanForm> {
       );
 
       if (response.statusCode == 201) {
-        // Success and parse JSON
         var responseJson = jsonDecode(response.body);
-        
         var inputId = responseJson['inputId'];
         var ptpDocument = responseJson['ptpDocument'];
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Pre-Task Plan submitted successfully!')),
         );
@@ -46,15 +51,22 @@ class _PreTaskPlanFormState extends State<PreTaskPlanForm> {
             builder: (context) => PreTaskPlanReviewPage(
               inputId: inputId,
               ptpDocument: ptpDocument,
-            )
-          )
+            ),
+          ),
         );
       } else {
-        // Handle error
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Submission failed: ${response.body}')),
         );
       }
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('An error occurred: $error')),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -90,8 +102,16 @@ class _PreTaskPlanFormState extends State<PreTaskPlanForm> {
               ),
               SizedBox(height: 20),
               ElevatedButton(
-                onPressed: _submitData,
-                child: Text('Submit'),
+                onPressed: _isLoading ? null : _submitData,
+                child: _isLoading ?
+                  SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      strokeWidth:2.0,
+                    ),
+                  ) : Text('Submit'),
               ),
             ],
           ),
